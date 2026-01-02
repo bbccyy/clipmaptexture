@@ -1,0 +1,1 @@
+资源太大，放在package的example不太合适，建议通过Editor目录下的工具类，自己切割图片获取。巨型贴图可以在https://sbcode.net/topoearth/blue-marble-texture-21600x10800/下载到。

@@ -1,0 +1,18 @@
+{
+	"name": "com.unity.clipmaptexture",
+	"displayName": "Clipmap Texture",
+	"version": "1.0.0",
+	"unity": "2020.3",
+	"description": "This is an engineering implementation of the Clipmap technology based on Unity. The aim is to solve the problems of texture rendering and data extraxtion for extremely large scenes, such as terrains or giant textures.",
+	"keywords": ["Clipmap","VT","Texture"],
+	"category": "",
+	"dependencies": {
+	},
+	"samples": [
+    {
+      "displayName": "Test Scene",
+      "description": "A sample showing how to use clipmap.",
+      "path": "Samples~/Assets/Scenes"
+    }
+  ]
+}
