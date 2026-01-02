@@ -10,7 +10,7 @@
 
 形象的说，Clipmap可以被想象成一组“跟随热点(比如主摄像机)移动的同心正方形窗口”，如下图所示：
 
-![Clipmap Texture Overview](https://gitlab.babeltime.com/unitypackage_pub/clipmaptexture/raw/master/img/A1.png)
+![Clipmap Texture Overview](https://github.com/bbccyy/clipmaptexture/blob/master/img/A1.png?raw=true)
 
 
 它具有明显的分层结构（Stack），但是除此之外，其内在还具有环形更新和手动混合等特点。下面逐一解释下：
@@ -19,14 +19,14 @@
 
 如下图所示，蓝色倒立金字塔中的每一片都对应了一个级别的纹理大小，最上面最大的蓝色片对应了最高精度下的巨型纹理全部内容，其需求的资源容量最大，在图中面积也最大，往下每递进一层，蓝色片对应的精度等级将会下降一级，一般而言尺寸缩小一半，容量缩小到上一层的`1/4`。图中依附在蓝色片上的绿色区域就是我们实际上放在Clipmap Textrue中的部分，它们使用相同的分辨率，因此最上层绿色区域能表述的纹理占比是最小的，仅为 `1/ (2^N)`，对应了摄像机附近最小且精度最高的一块区域。随着等级上升，占比最终会来到`1/(2^0) = 1 / 1 = 1`，也就是图中底部的绿色区域，该区域和其对应的蓝色片完全重合，意味着该层级的Mip以给定大小的尺寸能够完全覆盖原始巨型纹理对应的全部区域了。
 
-![Clipmap Texture Pyramid](https://gitlab.babeltime.com/unitypackage_pub/clipmaptexture/raw/master/img/A2.png)
+![Clipmap Texture Pyramid](https://github.com/bbccyy/clipmaptexture/blob/master/img/A2.png?raw=true)
 
 这些层级在空间上是重叠的，摄像机到它们各自的中心点都将在一定比例范围内，这就自然引出了第二个要点“**环形更新**（Toroidal Update / Rolling Buffer）”：
 
 在Clipmap系统重，摄像机移动时，物理显存中的纹理并不会整体移动。而是采用了增量加载配合循环利用的方式来为纹理更新减负。所谓增量加载，既系统在检测到摄像机位移后，通过计算新进入视野的区域（代码中的 `CalcBestLDCornerOfMip`），达到只加载这部分新的“图块（Tile/Block）”的目的，而不用全量加载和拷贝整个Layer。所谓的循环利用，本质是让旧的、移出视野的图块对应的内存中的位置，被新图块以覆盖，这在内存中表现为一个类似于“环形缓冲”的样式。最后在Shader采样时，由于物理纹理是环形的，Shader 利用 `TextureWrapMode.Repeat` 和 UV 偏移量（`LayerAnchor`）来正确采样，使得在视觉上纹理看起来是连续无限的。
 
 
-![Layer update](https://gitlab.babeltime.com/unitypackage_pub/clipmaptexture/raw/master/img/A3.png)
+![Layer update](https://github.com/bbccyy/clipmaptexture/blob/master/img/A3.png?raw=true)
 
 
 如上图，我们把一层Layer细分为 `4 X 4 = 16` 个Block，当Layer中心点开始向右上方偏移后，在**Step 0**中的黄色部分作为新增纹理，将会安装如 **Step 1**中箭头的方式替换 **Step 0** 中浅蓝色区域（移出视野的区域）。形成环形（首尾相接）的形式。
